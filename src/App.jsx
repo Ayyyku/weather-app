@@ -1,33 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react'
+import { inputStyle, labelStyle, buttonStyle } from './style'
+import WeatherCard from './components/WeatherCard'
+const API_KEY = "c7babac28e414a38afd104600241408"
 
-function App() {
-  const [count, setCount] = useState(0)
+
+const App = () => {
+  const [location, setLocation] = useState('')
+  const [weather, setWeather] = useState({})
+
+  const getWeather = async (city = "Ambarawa") => {
+    const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=yes`)
+    const data = await response.json()
+    setWeather(data)
+    console.log(data)
+  }
+
+  useEffect(() => {
+    getWeather()
+  }, [])
+
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="mx-auto w-3/6 flex mt-5 gap-3">
+        <div className="relative w-full h-10">
+          <input className={inputStyle} type="text" value={location} onChange={(e) => setLocation(e.target.value)} />
+          <label className={labelStyle}>City</label>
+        </div>
+        <button className={buttonStyle} onClick={() => getWeather(location)}>Search</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className="mx-auto">
+        {
+          weather.location && <WeatherCard weather={weather} />
+        }
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+
     </>
   )
 }
